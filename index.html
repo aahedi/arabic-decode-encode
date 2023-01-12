@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Arabic Decode/Encode Unicode</title>
+	<style>
+	body{text-align: center;}
+	textarea{text-align:left;width:100%;height:200px;font-size:20px;padding:20px;display:block;margin:10px 0px;resize: none;}
+	#txt_arab{user-select:text;padding:25px;text-align:right;direction:rtl;font-size:70px;height:200px;border:1px solid #000;overflow-y: auto;width: 100%;}
+	#txt_latin{width: 100%;}}
+	#txt_arab hr{margin-block-start: 0;margin-block-end: 0;margin-inline-start: auto; user-select: none; -webkit-user-drag: none;}
+	.container{width:85%;display: block;margin: 0 auto;}
+	</style>
+</head>
+<body>
+<h1>Arabic Decode/Encode</h1>
+<div class="container">
+Decode:
+<textarea id="txt_latin" placeholder="ex: \u0627\u0644\u0639\u064E\u0631\u064E\u0628\u0650\u064A\u064E\u0651\u0629\u200E">
+</textarea>Encode:
+<div id="txt_arab" contenteditable="true"></div>
+</div>
+<script>
+let txt_arab = document.getElementById('txt_arab');
+let txt_latin = document.getElementById('txt_latin');
+
+//https://stackoverflow.com/a/70630947
+function convert(string) {
+	var str = string;
+	var result = '';
+	if(string.includes('%u')){
+		str = string.trim().replace(/(%u)/g,'\\u');//unescape(str);
+	}
+	if(str.indexOf('\n') >= 1){
+		var arr = str.trim().split(/\r?\n/);
+		for (var i = 0; i < arr.length; i++) {
+			result += decodeURIComponent(JSON.parse('"'+arr[i].replace(/\"/g,'\\"')+'"'))+'<hr>';
+		}
+	}else{
+		result = decodeURIComponent(JSON.parse('"'+str.replace(/\"/g,'\\"')+'"'));
+	}
+	return result;
+}
+
+txt_latin.addEventListener("input", function(){
+	txt_arab.innerHTML = convert(txt_latin.value);
+});
+
+txt_arab.addEventListener("input", function() {
+	txt_latin.value = escape(txt_arab.textContent.trim()).replace(/(%u)/g,'\\u');
+}, false);
+
+document.addEventListener("DOMContentLoaded", function(event) {
+	txt_arab.innerHTML = convert(txt_latin.value);
+});
+
+</script>
+</body>
+</html>
